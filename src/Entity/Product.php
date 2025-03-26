@@ -32,7 +32,8 @@ class Product
     private $price;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+
     private $category;
 
     #[ORM\Column(type: 'boolean')]
