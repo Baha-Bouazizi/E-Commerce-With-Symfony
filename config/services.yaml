@@ -1,6 +1,6 @@
-# config/services.yaml
-
 parameters:
+    mailer.from_address: 'chouikhiabdallahpro@gmail.com'
+    mailer.from_name: 'Bouazizi E-Commerce'
 
 services:
     _defaults:
@@ -8,6 +8,7 @@ services:
         autoconfigure: true
         public: false
 
+    # Configuration globale
     App\:
         resource: '../src/'
         exclude:
@@ -15,9 +16,27 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
             - '../src/Tests/'
+            - '../src/Controller/AddressController.php'  # Exclure l'ancienne référence
 
-    # Configuration explicite pour AddressController
-    App\Controller\AddressController:
+    # Configuration spécifique pour les contrôleurs Admin
+    App\Controller\Admin\:
+        resource: '../src/Controller/Admin/'
         tags: ['controller.service_arguments']
-        public: true
-        
+
+    # Configuration spécifique pour les autres contrôleurs
+    App\Controller\:
+        resource: '../src/Controller/'
+        exclude:
+            - '../src/Controller/Admin/'
+        tags: ['controller.service_arguments']
+
+    # Configuration explicite pour SmtpMailService
+    App\Service\SmtpMailService:
+        arguments:
+            $fromAddress: '%mailer.from_address%'
+            $fromName: '%mailer.from_name%'
+
+    # Configuration explicite pour OrderStateChangeListener
+    App\EventListener\OrderStateChangeListener:
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Order }

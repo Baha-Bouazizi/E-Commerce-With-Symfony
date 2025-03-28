@@ -19,7 +19,7 @@ class Mail
                 [
                     'From' => 
                     [
-                        'Email' => "bonnal.tristan@hotmail.fr",
+                        'Email' => "Baha.Bouazizi@isimg.tn",
                         'Name' => "La Boot'ique"
                     ],
                     'To' => 

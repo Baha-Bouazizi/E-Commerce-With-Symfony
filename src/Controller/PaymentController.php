@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Model\Cart;
 use App\Repository\OrderRepository;
-use App\Service\Mail;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
@@ -54,8 +53,7 @@ class PaymentController extends AbstractController
         Stripe::setApiKey('sk_test_51Kb6uhClAQQ2TXfzOspWIks7VFbXX5e5ZTr5c4VCIQfNJATKvQZDHBODlaDkCnNmYntKUQLZK8YF4UbNPA5gMWzg00RHLAzE0G');
         header('Content-Type: application/json');
 
-        $YOUR_DOMAIN = 'https://ecommerce.tristan-bonnal.fr';
-        
+        $YOUR_DOMAIN = $_ENV['APP_DOMAIN'] ?? 'http://localhost:8000';        
         // Création de la session Stripe avec les données du panier
         $checkout_session = Session::create([
             'line_items' => $productsForStripe,
@@ -68,8 +66,6 @@ class PaymentController extends AbstractController
         return $this->redirect($checkout_session->url);
     }
 
-
-
     /**
      * Méthode appelée lorsque le paiement est validé
      */
@@ -78,25 +74,15 @@ class PaymentController extends AbstractController
     {
         $order = $repository->findOneByStripeSession($stripeSession);
         if (!$order || $order->getUser() != $this->getUser()) {
-            throw $this->createNotFoundException('Commande innaccessible');
+            throw $this->createNotFoundException('Commande inaccessible');
         }
+    
+        // Vérifie que le paiement n'était pas déjà confirmé
         if (!$order->getState()) {
             $order->setState(1);
             $em->flush();
         }
-
-        // Envoi mail de Confirmation
-        $user = $this->getUser();
-
-        $content = "Bonjour {$user->getFirstname()} nous vous remercions de votre commande";
-        (new Mail)->send(
-            $user->getEmail(), 
-            $user->getFirstname(), 
-            "Confirmation de la commande {$order->getReference()}", 
-            $content
-        );
-
-        // Suppression du panier une fois la commande validée
+    
         $cart->remove();    
         return $this->render('payment/success.html.twig', [
             'order' => $order
