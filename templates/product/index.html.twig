@@ -5,24 +5,130 @@
 {% block body %}
 <div class="row">
     <div class="col-md-3">
-        <h3 class="text-center">Rechercher</h3>
-        {{ form(form) }}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="category-title">Rechercher</h3>
+                {{ form(form) }}
+            </div>
+        </div>
+        
+        {% if allCategories is not null %}
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="category-title">Catégories</h3>
+                <div class="category-pills">
+                    <a href="{{ path('product') }}" class="category-pill active">Tous</a>
+                    {% for category in allCategories %}
+                        <a href="#category-{{ category.id }}" class="category-pill js-category-pill">{{ category.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
+    
     <div class="col-md-9">
-            <h3 class="text-center">Nos Produits</h3>
-        <div class="row">
-            {% for product in products %}
-                <div class="col-md-4">
-                    <div class="product-item">
-                        <a href="{{ path('product_show', {slug: product.slug}) }}"><img class="img-fluid" src="/uploads/{{product.image}}" alt="{{product.name}}"></a>
-                        <h5 class="mt-2">{{ product.name}}</h5>
-                        <span class="product-subtitle text-center">{{product.subtitle}}</span>
-                        <span class="product-price text-center">{{(product.price / 100 )|number_format(2,',', '.')}} € </span>
+        {% if productsByCategory is null %}
+            {# Mode recherche : afficher les produits normalement #}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="category-title">Résultats de recherche</h3>
+                    <div class="row">
+                        {% for product in products %}
+                            <div class="col-md-4">
+                                <div class="product-card">
+                                    <div class="product-img-container">
+                                        <a href="{{ path('product_show', {slug: product.slug}) }}">
+                                            <img class="product-img" src="/uploads/{{product.image}}" alt="{{product.name}}">
+                                        </a>
+                                    </div>
+                                    <div class="product-body">
+                                        <h5 class="product-title">{{ product.name }}</h5>
+                                        <span class="product-subtitle">{{product.subtitle}}</span>
+                                        <span class="product-price">{{(product.price / 100)|number_format(2,',', '.')}} €</span>
+                                        <div class="product-footer">
+                                            {% if product.stock > 0 %}
+                                                <div class="badge badge-stock">En stock</div>
+                                            {% else %}
+                                                <div class="badge badge-out">Rupture</div>
+                                            {% endif %}
+                                            <a href="{{ path('add_to_cart', {id: product.id}) }}" class="btn btn-cart btn-sm {% if product.stock <= 0 %}disabled{% endif %}">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-12 text-center py-5">
+                                <p>Aucun produit trouvé pour cette recherche.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            {# Mode normal : afficher par catégorie #}
+            {% for categoryId, categoryData in productsByCategory %}
+                <div id="category-{{ categoryData.category.id }}" class="category-section card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="category-title">{{ categoryData.category.name }}</h3>
+                        <div class="row">
+                            {% for product in categoryData.products %}
+                                <div class="col-md-4">
+                                    <div class="product-card">
+                                        <div class="product-img-container">
+                                            <a href="{{ path('product_show', {slug: product.slug}) }}">
+                                                <img class="product-img" src="/uploads/{{product.image}}" alt="{{product.name}}">
+                                            </a>
+                                        </div>
+                                        <div class="product-body">
+                                            <h5 class="product-title">{{ product.name }}</h5>
+                                            <span class="product-subtitle">{{product.subtitle}}</span>
+                                            <span class="product-price">{{(product.price / 100)|number_format(2,',', '.')}} €</span>
+                                            <div class="product-footer">
+                                                {% if product.stock > 0 %}
+                                                    <div class="badge badge-stock">En stock</div>
+                                                {% else %}
+                                                    <div class="badge badge-out">Rupture</div>
+                                                {% endif %}
+                                                <a href="{{ path('add_to_cart', {id: product.id}) }}" class="btn btn-cart btn-sm {% if product.stock <= 0 %}disabled{% endif %}">
+                                                    <i class="bi bi-cart-plus"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             {% endfor %}
-        </div> 
+        {% endif %}
     </div>
 </div>
-  
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navigation fluide vers les catégories
+        const categoryPills = document.querySelectorAll('.js-category-pill');
+        categoryPills.forEach(pill => {
+            pill.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Mise à jour des classes actives
+                    categoryPills.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Facture {{ order.reference }}</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        .invoice-logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .invoice-title {
+            font-size: 24px;
+            color: #3498db;
+            margin: 10px 0;
+        }
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .company-details, .client-details {
+            width: 45%;
+        }
+        h3 {
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background-color: #f8f9fa;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1 class="invoice-title">FACTURE</h1>
+        <p>Référence: {{ order.reference }}</p>
+        <p>Date: {{ date|date('d/m/Y') }}</p>
+        {% if stateLabel is defined and stateLabel is not empty %}
+        <p style="background-color: #e8f4fd; padding: 5px 10px; display: inline-block; border-radius: 4px; color: #3498db;">État actuel: {{ stateLabel }}</p>
+        {% endif %}
+    </div>
+
+    <div class="invoice-details">
+        <div class="company-details">
+            <h3>La Boot'ique</h3>
+            <p>123 Avenue du Commerce<br>
+            75000 Paris<br>
+            France<br>
+            Email: contact@labootique.fr<br>
+            Téléphone: 01 23 45 67 89</p>
+        </div>
+        <div class="client-details">
+            <h3>Facturé à</h3>
+            <p>{{ order.user.fullname }}<br>
+            Email: {{ order.user.email }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.orderDetails %}
+            <tr>
+                <td>{{ item.product }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ (item.price / 100)|number_format(2, ',', ' ') }} €</td>
+                <td class="text-right">{{ ((item.price * item.quantity) / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3" class="text-right">Sous-total</td>
+                <td class="text-right">{{ ((order.total - order.carrierPrice) / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right">Frais de livraison ({{ order.carrierName }})</td>
+                <td class="text-right">{{ (order.carrierPrice / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3" class="text-right">Total TTC</td>
+                <td class="text-right">{{ (order.total / 100)|number_format(2, ',', ' ') }} €</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="payment-info">
+        <h3>Informations de paiement</h3>
+        <p>Commande payée le {{ order.createdAt|date('d/m/Y') }}</p>
+        <p>Merci pour votre achat !</p>
+    </div>
+
+    <div class="footer">
+        <p>La Boot'ique - SIRET: 123 456 789 00019 - TVA: FR12345678900</p>
+    </div>
+</body>
+</html>

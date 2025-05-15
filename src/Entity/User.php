@@ -43,6 +43,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class)]
     private $orders;
+    
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private $phoneNumber;
+    
+    #[ORM\Column(type: 'string', length: 6, nullable: true)]
+    private $otpCode;
+    
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $otpExpires;
+    
+    #[ORM\Column(type: 'boolean')]
+    private $isPhoneVerified = false;
 
     public function __construct()
     {
@@ -227,5 +239,61 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
 
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+    
+    public function getOtpCode(): ?string
+    {
+        return $this->otpCode;
+    }
+
+    public function setOtpCode(?string $otpCode): self
+    {
+        $this->otpCode = $otpCode;
+
+        return $this;
+    }
+    
+    public function getOtpExpires(): ?\DateTimeInterface
+    {
+        return $this->otpExpires;
+    }
+
+    public function setOtpExpires(?\DateTimeInterface $otpExpires): self
+    {
+        $this->otpExpires = $otpExpires;
+
+        return $this;
+    }
+    
+    public function isOtpValid(): bool
+    {
+        if (!$this->otpCode || !$this->otpExpires) {
+            return false;
+        }
+        
+        return $this->otpExpires > new \DateTime();
+    }
+    
+    public function isPhoneVerified(): bool
+    {
+        return $this->isPhoneVerified;
+    }
+
+    public function setIsPhoneVerified(bool $isPhoneVerified): self
+    {
+        $this->isPhoneVerified = $isPhoneVerified;
+
+        return $this;
+    }
 }

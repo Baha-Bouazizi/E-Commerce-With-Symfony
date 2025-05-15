@@ -1,5 +1,24 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Inscription{% endblock %}
+
 {% block body %}
-    {{form(form)}}
+    <div class="container my-5">
+        <h1 class="mb-4">Créer un compte</h1>
+        
+        {% for flash_error in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">
+                {{ flash_error }}
+            </div>
+        {% endfor %}
+
+        {{ form_start(form) }}
+            {{ form_row(form.firstname) }}
+            {{ form_row(form.lastname) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.phoneNumber) }}
+            {{ form_row(form.password) }}
+            {{ form_row(form.submit) }}
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

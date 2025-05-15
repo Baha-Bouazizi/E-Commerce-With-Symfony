@@ -1,12 +1,17 @@
 parameters:
     mailer.from_address: 'chouikhiabdallahpro@gmail.com'
     mailer.from_name: 'Bouazizi E-Commerce'
+    twilio_account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    twilio_auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    twilio_phone_number: '%env(TWILIO_PHONE_NUMBER)%'
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
         public: false
+        bind:
+            $projectDir: '%kernel.project_dir%'
 
     # Configuration globale
     App\:
@@ -35,6 +40,21 @@ services:
         arguments:
             $fromAddress: '%mailer.from_address%'
             $fromName: '%mailer.from_name%'
+            
+    # Configuration explicite pour InvoiceGenerator
+    App\Service\InvoiceGenerator:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            
+    # Configuration explicite pour PdfGenerator
+    App\Service\PdfGenerator:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            
+    # Configuration explicite pour TwilioService
+    App\Service\TwilioService:
+        arguments:
+            $params: '@parameter_bag'
 
     # Configuration explicite pour OrderStateChangeListener
     App\EventListener\OrderStateChangeListener:

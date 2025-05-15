@@ -60,7 +60,7 @@ class OrderController extends AbstractController
      * @return Response
      */
     #[Route('/commande/recap', name: 'order_add', methods: 'POST')]
-    public function summary(Cart $cart, Request $request, EntityManagerInterface $em): Response
+    public function summary(Cart $cart, Request $request, EntityManagerInterface $em, \App\Service\StockNotifier $stockNotifier): Response
     {
          //Récupération du panier en session
         $cartProducts = $cart->getDetails();   
@@ -99,13 +99,31 @@ class OrderController extends AbstractController
 
             //Création des lignes de détails pour chacun des produits de la commande
             foreach ($cartProducts['products'] as $item) {
+                $product = $item['product'];
+                $quantity = $item['quantity'];
+                
+                // Vérifier si le stock est suffisant avant de valider la commande
+                if (!$product->hasEnoughStock($quantity)) {
+                    $this->addFlash('error', 'Stock insuffisant pour le produit ' . $product->getName() . '. Veuillez ajuster votre panier.');
+                    return $this->redirectToRoute('cart');
+                }
+                
+                // Décrémenter le stock du produit
+                $product->decrementStock($quantity);
+                $em->persist($product);
+                
+                // Si le produit est maintenant en rupture de stock, envoyer une notification
+                if ($product->getStock() == 0) {
+                    $stockNotifier->sendLowStockNotification($product);
+                }
+                
                 $orderDetails = new OrderDetails();
                 $orderDetails
                     ->setBindedOrder($order)
-                    ->setProduct($item['product']->getName())
-                    ->setQuantity($item['quantity'])
-                    ->setPrice($item['product']->getPrice())
-                    ->setTotal($item['product']->getPrice() * $item['quantity'])
+                    ->setProduct($product->getName())
+                    ->setQuantity($quantity)
+                    ->setPrice($product->getPrice())
+                    ->setTotal($product->getPrice() * $quantity)
                 ;
                 $em->persist($orderDetails);
             }

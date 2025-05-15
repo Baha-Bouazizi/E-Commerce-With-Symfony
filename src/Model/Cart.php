@@ -20,14 +20,28 @@ class Cart
 
     /**
      * Crée un tableau associatif id => quantité et le stocke en session
+     * Vérifie la disponibilité du stock avant d'ajouter
      *
      * @param int $id
-     * @return void
+     * @return bool Retourne true si le produit a été ajouté, false si le stock est insuffisant
      */
-    public function add(int $id):void
+    public function add(int $id): bool
     {
         $cart = $this->session->get('cart', []);
-
+        $product = $this->repository->find($id);
+        
+        if (!$product) {
+            return false;
+        }
+        
+        // Quantité actuellement dans le panier (0 si pas encore dans le panier)
+        $currentQuantity = empty($cart[$id]) ? 0 : $cart[$id];
+        
+        // Vérifier si l'ajout d'une unité supplémentaire est possible
+        if (!$product->hasEnoughStock($currentQuantity + 1)) {
+            return false;
+        }
+        
         if (empty($cart[$id])) {
             $cart[$id] = 1;
         } else {
@@ -35,7 +49,7 @@ class Cart
         }
 
         $this->session->set('cart', $cart);
-
+        return true;
     }
 
     /**

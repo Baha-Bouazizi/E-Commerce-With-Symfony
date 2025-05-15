@@ -39,6 +39,9 @@ class Product
     #[ORM\Column(type: 'boolean')]
     private $isInHome;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private $stock;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,5 +143,32 @@ class Product
         return $this;
     }
 
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
 
+    public function setStock(int $stock): self
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+    /**
+     * Décrémente le stock du produit de la quantité spécifiée
+     */
+    public function decrementStock(int $quantity): self
+    {
+        $this->stock = max(0, $this->stock - $quantity);
+        return $this;
+    }
+
+    /**
+     * Vérifie si la quantité demandée est disponible en stock
+     */
+    public function hasEnoughStock(int $quantity): bool
+    {
+        return $this->stock >= $quantity;
+    }
 }

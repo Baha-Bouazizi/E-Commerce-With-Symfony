@@ -9,11 +9,13 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegisterType extends AbstractType
 {
@@ -38,6 +40,22 @@ class RegisterType extends AbstractType
                 'constraints' => new Email(),
                 'attr' => [
                     'placeholder' => 'jean.passe@hotgmail.com'
+                ]
+            ])
+            ->add('phoneNumber', TelType::class, [
+                'label' => 'Numéro de téléphone',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => '+33612345678'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez renseigner un numéro de téléphone',
+                    ]),
+                    new Regex([
+                        'pattern' => '/^\+[1-9]\d{1,}(\s\d+)*$/',
+                        'message' => 'Veuillez entrer un numéro de téléphone valide au format international (ex: +33 612345678)'
+                    ])
                 ]
             ])
             ->add('password', RepeatedType::class, [

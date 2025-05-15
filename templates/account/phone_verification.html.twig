@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérification de téléphone{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="my-4">Vérification de votre numéro de téléphone</h1>
+            
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            
+            {% if app.session.has('twilio_error') %}
+                <div class="alert alert-danger">
+                    {{ app.session.get('twilio_error') }}
+                </div>
+            {% endif %}
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Étape 1: Entrez votre numéro de téléphone</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Pour sécuriser votre compte, nous avons besoin de vérifier votre numéro de téléphone.</p>
+                    
+                    {{ form_start(phoneForm) }}
+                    <div class="form-group">
+                        {{ form_row(phoneForm.phoneNumber) }}
+                        <small class="form-text text-muted">Entrez votre numéro au format international (ex: +33612345678)</small>
+                    </div>
+                    {{ form_end(phoneForm) }}
+                </div>
+            </div>
+            
+            {% if user.otpCode %}
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Étape 2: Entrez le code reçu par SMS</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Nous avons envoyé un code de vérification à 6 chiffres au numéro {{ user.phoneNumber }}.</p>
+                    
+                    {% if isDevelopment and otpCode %}
+                    <div class="alert alert-warning">
+                        <strong>Mode développement :</strong> Utilisez ce code pour tester : <span class="badge bg-primary">{{ otpCode }}</span>
+                        <br><small>Ce message ne s'affiche qu'en mode développement</small>
+                    </div>
+                    {% endif %}
+                    
+                    {{ form_start(otpForm) }}
+                    <div class="form-group">
+                        {{ form_row(otpForm.otpCode) }}
+                        <small class="form-text text-muted">Le code est valable pendant 15 minutes</small>
+                    </div>
+                    {{ form_end(otpForm) }}
+                    
+                    <p class="mt-3">
+                        <small>Vous n'avez pas reçu le code ? 
+                            <a href="{{ path('app_phone_verification') }}" onclick="document.getElementById('phone-submit-btn').click(); return false;">
+                                Renvoyer un nouveau code
+                            </a>
+                        </small>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

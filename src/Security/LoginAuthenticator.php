@@ -45,10 +45,20 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        // Toujours vérifier si l'utilisateur a besoin de vérifier son téléphone en priorité
+        $user = $token->getUser();
+        
+        // Pour le débogage - force la redirection vers la vérification téléphonique
+        if ($user->getPhoneNumber() && !$user->isPhoneVerified()) {
+            return new RedirectResponse($this->urlGenerator->generate('app_phone_verification'));
+        }
+        
+        // Si tout va bien, redirection selon le targetPath ou vers le compte
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
-
+        
+        // Redirection par défaut
         return new RedirectResponse($this->urlGenerator->generate('account'));
     }
 

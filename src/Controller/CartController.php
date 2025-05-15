@@ -31,12 +31,18 @@ class CartController extends AbstractController
      * Ajoute un article au panier (id du produit) et incrémente la quantitée (voir classe Cart)
      * @param Cart $cart
      * @param int $id
-     * @return Repsonse
+     * @return Response
      */
     #[Route('/panier/ajouter/{id}', name: 'add_to_cart')]
     public function add(Cart $cart, int $id): Response
     {
-        $cart->add($id);
+        $added = $cart->add($id);
+        
+        // Si l'ajout a échoué (stock insuffisant)
+        if (!$added) {
+            $this->addFlash('error', 'Stock insuffisant pour ce produit!'); 
+        }
+        
         return $this->redirectToRoute('cart');
     }
 

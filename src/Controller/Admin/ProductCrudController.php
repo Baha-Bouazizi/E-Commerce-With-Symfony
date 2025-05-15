@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -28,7 +29,6 @@ class ProductCrudController extends AbstractCrudController
             ;
     }
 
-  
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -42,6 +42,7 @@ class ProductCrudController extends AbstractCrudController
             TextField::new('subtitle', 'Sous-titre'),
             TextareaField::new('description')->hideOnIndex(),
             MoneyField::new('price', 'Prix')->setCurrency('EUR'),
+            IntegerField::new('stock', 'Stock disponible'),
             AssociationField::new('category', 'Catégorie'),
             BooleanField::new('isInHome', 'Top produit')
         ];
@@ -54,5 +55,4 @@ class ProductCrudController extends AbstractCrudController
             ->setEntityLabelInPlural('Produits')
         ;
     }
-
 }

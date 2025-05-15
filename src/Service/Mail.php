@@ -20,7 +20,7 @@ class Mail
                     'From' => 
                     [
                         'Email' => "Baha.Bouazizi@isimg.tn",
-                        'Name' => "La Boot'ique"
+                        'Name' => "Bouazizi E-Commerce"
                     ],
                     'To' => 
                     [

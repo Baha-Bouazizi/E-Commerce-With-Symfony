@@ -1,5 +1,79 @@
-<ul class="">
-    <li class=""><small>&copy; 2025 Sufetula Store</small></li>                
-    <li class=""><small><a href="">Mentions légales</a></small></li>                
-    {# <li class="list-group-item"><a href="#">Retour haut de page</a></li>                 #}
-</ul>
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <h4 class="footer-title">Sefutla Store</h4>
+            <p class="mb-3">Votre boutique en ligne de produits de qualité avec une sélection unique et des prix compétitifs.</p>
+            <div class="d-flex mb-3">
+                <a href="#" class="me-3 text-white"><i class="bi bi-facebook fs-5"></i></a>
+                <a href="#" class="me-3 text-white"><i class="bi bi-instagram fs-5"></i></a>
+                <a href="#" class="me-3 text-white"><i class="bi bi-twitter fs-5"></i></a>
+                <a href="#" class="text-white"><i class="bi bi-linkedin fs-5"></i></a>
+            </div>
+        </div>
+        
+        <div class="col-lg-2 col-md-6 mb-4">
+            <h4 class="footer-title">Catégories</h4>
+            <a href="{{ path('product') }}" class="footer-link">Tous les produits</a>
+            <a href="{{ path('product') }}" class="footer-link">Nouveautés</a>
+            <a href="{{ path('product') }}" class="footer-link">Promotions</a>
+            <a href="{{ path('product') }}" class="footer-link">Meilleures ventes</a>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <h4 class="footer-title">Informations</h4>
+            <a href="{{ path('about') }}" class="footer-link">À propos de nous</a>
+            <a href="{{ path('home') }}" class="footer-link">Conditions générales</a>
+            <a href="{{ path('home') }}" class="footer-link">Mentions légales</a>
+            <a href="{{ path('contact') }}" class="footer-link">Contactez-nous</a>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-4">
+            <h4 class="footer-title">Mon compte</h4>
+            {% if app.user %}
+                <a href="{{ path('account') }}" class="footer-link">Mon profil</a>
+                <a href="{{ path('account_orders') }}" class="footer-link">Mes commandes</a>
+                <a href="{{ path('account_address') }}" class="footer-link">Mes adresses</a>
+                <a href="{{ path('account_password') }}" class="footer-link">Changer mon mot de passe</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="footer-link">Connexion</a>
+                <a href="{{ path('register') }}" class="footer-link">Inscription</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <p class="mb-0">&copy; {{ 'now'|date('Y') }} Sefutla Store. Tous droits réservés.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <img src="{{ asset('assets/images/payment-methods.png') }}" alt="Méthodes de paiement" class="payment-methods" onerror="this.style.display='none'" style="max-height: 25px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="back-to-top" class="btn btn-secondary btn-sm position-fixed bottom-0 end-0 m-4 rounded-circle" style="width: 45px; height: 45px; display: none; z-index: 1000;">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Back to top button
+        var backToTopBtn = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'flex';
+                backToTopBtn.style.alignItems = 'center';
+                backToTopBtn.style.justifyContent = 'center';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+</script>
